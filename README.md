@@ -1,4 +1,4 @@
-# Application Re-platforming Demo: VM to Container with Google Cloud
+# Application Re-platforming Demo Script: VM to Container with Google Cloud
 
 ## 🚀 Modernize Your Applications with Migrate to Containers
 
