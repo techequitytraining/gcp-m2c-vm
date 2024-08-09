@@ -304,7 +304,7 @@ if [ $MODE -eq 1 ]; then
 elif [ $MODE -eq 2 ]; then
     export STEP="${STEP},1"
     echo
-    echo "$ gcloud --project $GCP_PROJECT services enable servicemanagement.googleapis.com servicecontrol.googleapis.com cloudresourcemanager.googleapis.com compute.googleapis.com container.googleapis.com artifactregistry.googleapis.com cloudbuild.googleapis.com artifactregistry.googleapis.com run.googleapis.com containeranalysis.googleapis.com run.googleapis.com # to enable APIs" | pv -qL 100
+    echo "$ gcloud --project $GCP_PROJECT services enable servicemanagement.googleapis.com servicecontrol.googleapis.com cloudresourcemanager.googleapis.com compute.googleapis.com container.googleapis.com cloudbuild.googleapis.com artifactregistry.googleapis.com containeranalysis.googleapis.com run.googleapis.com # to enable APIs" | pv -qL 100
     gcloud --project $GCP_PROJECT services enable servicemanagement.googleapis.com servicecontrol.googleapis.com cloudresourcemanager.googleapis.com compute.googleapis.com container.googleapis.com artifactregistry.googleapis.com cloudbuild.googleapis.com clouddeploy.googleapis.com containeranalysis.googleapis.com run.googleapis.com
 elif [ $MODE -eq 3 ]; then
     export STEP="${STEP},1x"
