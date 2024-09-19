@@ -593,8 +593,6 @@ elif [ $MODE -eq 2 ]; then
     echo "$ sed -i \"/^ENTRYPOINT/i $LINE\" \"$FILE\" # to customize Dockerfile" | pv -qL 100
     sed -i "/^ENTRYPOINT/i $LINE" "$FILE"
     echo
-    mv $PROJDIR/artifacts/deployment_spec.yaml $PROJDIR/artifacts/deployment_gke.yaml > /dev/null 2>&1
-    mv $PROJDIR/artifacts/skaffold.yaml $PROJDIR/artifacts/skaffold_gke.yaml > /dev/null 2>&1
     echo "$ cat <<EOF > $PROJDIR/artifacts/skaffold_cloudrun.yaml
 apiVersion: skaffold/v4beta4
 kind: Config
@@ -633,9 +631,6 @@ manifests:
 deploy:
   cloudrun: {}
 EOF
-    echo
-    echo "$ cp $PROJDIR/artifacts/skaffold_cloudrun.yaml $PROJDIR/artifacts/skaffold.yaml # to create config file" | pv -qL 100
-    cp $PROJDIR/artifacts/skaffold_cloudrun.yaml $PROJDIR/artifacts/skaffold.yaml
     echo
     echo "$ cat <<EOF > $PROJDIR/artifacts/deployment_cloudrun.yaml
 apiVersion: serving.knative.dev/v1
@@ -680,13 +675,19 @@ spec:
           - containerPort: 80
 EOF
     echo
-    echo "$ skaffold run -d eu.gcr.io/$GCP_PROJECT --cloud-run-location=$GCP_REGION --cloud-run-project=$GCP_PROJECT # to deploy the workload" | pv -qL 100
-    skaffold run -d eu.gcr.io/$GCP_PROJECT --cloud-run-location=$GCP_REGION --cloud-run-project=$GCP_PROJECT
+    echo "$ skaffold run -f $PROJDIR/artifacts/skaffold_cloudrun.yaml -d eu.gcr.io/$GCP_PROJECT --cloud-run-location=$GCP_REGION --cloud-run-project=$GCP_PROJECT # to deploy the workload to Cloud Run" | pv -qL 100
+    skaffold run -f $PROJDIR/artifacts/skaffold_cloudrun.yaml -d eu.gcr.io/$GCP_PROJECT --cloud-run-location=$GCP_REGION --cloud-run-project=$GCP_PROJECT
+    echo
+    echo "$ skaffold run -f $PROJDIR/artifacts/skaffold.yaml -d eu.gcr.io/$GCP_PROJECT # to deploy the workload to GKE" | pv -qL 100
+    skaffold run -f $PROJDIR/artifacts/skaffold.yaml -d eu.gcr.io/$GCP_PROJECT
 elif [ $MODE -eq 3 ]; then
     export STEP="${STEP},4x"   
     echo
     echo "$ gcloud --project $GCP_PROJECT run services delete ${CONTAINER_NAME} --region $GCP_REGION # to delete service" | pv -qL 100
     gcloud --project $GCP_PROJECT run services delete ${CONTAINER_NAME} --region $GCP_REGION
+    echo
+    echo "$ kubectl delete -f $PROJDIR/artifacts/deployment_spec.yaml # to delete service" | pv -qL 100
+    kubectl delete -f $PROJDIR/artifacts/deployment_spec.yaml
 else
     export STEP="${STEP},4i"   
     echo
