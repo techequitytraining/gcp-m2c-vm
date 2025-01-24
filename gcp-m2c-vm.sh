@@ -60,8 +60,6 @@ if [ -f "$PROJDIR/.env" ]; then
 else
 cat <<EOF > $PROJDIR/.env
 export GCP_PROJECT=$GCP_PROJECT
-export GCP_REGION=us-central1
-export GCP_ZONE=us-central1-a
 export VM_NAME=NOT_SET
 export CONTAINER_NAME=NOT_SET
 EOF
@@ -144,16 +142,12 @@ if [[ ! -z "$TRAINING_ORG_ID" ]]  &&  [[ $ORG_ID == "$TRAINING_ORG_ID" ]]; then
         export GOOGLE_APPLICATION_CREDENTIALS=$PROJDIR/.${GCP_PROJECT}.json
         cat <<EOF > $PROJDIR/.env
 export GCP_PROJECT=$GCP_PROJECT
-export GCP_REGION=us-central1
-export GCP_ZONE=us-central1-a
 export VM_NAME=$VM_NAME
 export CONTAINER_NAME=$CONTAINER_NAME
 EOF
         gsutil cp $PROJDIR/.env gs://${GCP_PROJECT}/${SCRIPTNAME}.env > /dev/null 2>&1
         echo
         echo "*** Google Cloud project is $GCP_PROJECT ***" | pv -qL 100
-        echo "*** Google Cloud region is $GCP_REGION ***" | pv -qL 100
-        echo "*** Google Cloud zone is $GCP_ZONE ***" | pv -qL 100
         echo "*** Virtual machine name is $VM_NAME ***" | pv -qL 100
         echo "*** Container name is $CONTAINER_NAME ***" | pv -qL 100
         echo
@@ -239,16 +233,12 @@ else
                 export GOOGLE_APPLICATION_CREDENTIALS=$PROJDIR/.${GCP_PROJECT}.json
                 cat <<EOF > $PROJDIR/.env
 export GCP_PROJECT=$GCP_PROJECT
-export GCP_REGION=us-central1
-export GCP_ZONE=us-central1-a
 export VM_NAME=$VM_NAME
 export CONTAINER_NAME=$CONTAINER_NAME
 EOF
                 gsutil cp $PROJDIR/.env gs://${GCP_PROJECT}/${SCRIPTNAME}.env > /dev/null 2>&1
                 echo
                 echo "*** Google Cloud project is $GCP_PROJECT ***" | pv -qL 100
-                echo "*** Google Cloud region is $GCP_REGION ***" | pv -qL 100
-                echo "*** Google Cloud zone is $GCP_ZONE ***" | pv -qL 100
                 echo "*** Virtual machine name is $VM_NAME ***" | pv -qL 100
                 echo "*** Container name is $CONTAINER_NAME ***" | pv -qL 100
                 echo
@@ -586,6 +576,7 @@ EOF" | pv -qL 100
 elif [ $MODE -eq 2 ]; then
     export STEP="${STEP},5"   
     gcloud config set project $GCP_PROJECT > /dev/null 2>&1
+    export GCP_REGION=$(gcloud compute instances list --project=$GCP_PROJECT --filter=name:$VM_NAME --format="table[csv,no-heading](zone)") | awk -F'-' '{print $1"-"$2}'
     cd $PROJDIR/artifacts
     LINE="RUN mkdir -p /var/log/${CONTAINER_NAME}/ && chmod -R 744 /var/log/${CONTAINER_NAME}/"
     FILE="$PROJDIR/artifacts/Dockerfile"
