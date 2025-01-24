@@ -576,7 +576,8 @@ EOF" | pv -qL 100
 elif [ $MODE -eq 2 ]; then
     export STEP="${STEP},5"   
     gcloud config set project $GCP_PROJECT > /dev/null 2>&1
-    export GCP_REGION=$(gcloud compute instances list --project=$GCP_PROJECT --filter=name:$VM_NAME --format="table[csv,no-heading](zone)") | awk -F'-' '{print $1"-"$2}'
+    export VM_ZONE=$(gcloud compute instances list --project=$GCP_PROJECT --filter=name:$VM_NAME --format="table[csv,no-heading](zone)")
+    export GCP_REGION=$(gcloud compute instances list --project=$GCP_PROJECT --filter=name:$VM_NAME --format="table[csv,no-heading](zone)" | awk -F'-' '{print $1"-"$2}'
     cd $PROJDIR/artifacts
     LINE="RUN mkdir -p /var/log/${CONTAINER_NAME}/ && chmod -R 744 /var/log/${CONTAINER_NAME}/"
     FILE="$PROJDIR/artifacts/Dockerfile"
