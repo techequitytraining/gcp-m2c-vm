@@ -455,7 +455,7 @@ if [ $MODE -eq 1 ]; then
     echo "$ sudo apt-get update -qq && sudo apt-get install -y rsync # Install rsync" | pv -qL 100
     sudo apt-get update -qq && sudo apt-get install -y rsync
     echo
-    echo "$ rsync -avzh --progress --stats --exclude-from=\$PROJDIR/filters.txt --rsync-path="sudo rsync"  -e "gcloud compute ssh apache2-vm --zone=\$VM_ZONE --" :/ \$PROJDIR/filesystem/ # to syncronise file system" | pv -qL 100
+    echo "$ rsync -avzh --progress --stats --exclude-from=$PROJDIR/filters.txt --rsync-path="sudo rsync" -e "gcloud compute ssh \$VM_NAME --zone=\$VM_ZONE --" :/ $PROJDIR/filesystem/ # to syncronise file system" | pv -qL 100
     echo
     echo "$ mkdir \$PROJDIR/migrationplan && \$PROJDIR/m2c analyze -s \$PROJDIR/filesystem  -p linux-vm-container -o \$PROJDIR/migrationplan  # to get and update migration plan" | pv -qL 100
     echo
@@ -498,8 +498,8 @@ if [ $MODE -eq 1 ]; then
     echo "$ sudo apt-get update -qq && sudo apt-get install -y rsync # Install rsync" | pv -qL 100
     sudo apt-get update -qq && sudo apt-get install -y rsync
     echo
-    echo "$ rsync -avzh --progress --stats --exclude-from=$PROJDIR/filters.txt --rsync-path="sudo rsync"  -e "gcloud compute ssh apache2-vm --zone=$VM_ZONE --" :/ $PROJDIR/filesystem/ # to syncronise file system" | pv -qL 100
-    rsync -avzh --progress --stats --exclude-from=$PROJDIR/filters.txt --rsync-path="sudo rsync"  -e "gcloud compute ssh apache2-vm --zone=$VM_ZONE --" :/ $PROJDIR/filesystem/
+    echo "$ rsync -avzh --progress --stats --exclude-from=$PROJDIR/filters.txt --rsync-path="sudo rsync" -e "gcloud compute ssh $VM_NAME --zone=$VM_ZONE --" :/ $PROJDIR/filesystem/ # to syncronise file system" | pv -qL 100
+    rsync -avzh --progress --stats --exclude-from=$PROJDIR/filters.txt --rsync-path="sudo rsync" -e "gcloud compute ssh $VM_NAME --zone=$VM_ZONE --" :/ $PROJDIR/filesystem/
     echo
     sudo rm -rf $PROJDIR/migrationplan
     echo "$ mkdir $PROJDIR/migrationplan && $PROJDIR/m2c analyze -s $PROJDIR/filesystem  -p linux-vm-container -o $PROJDIR/migrationplan  # to get and update migration plan" | pv -qL 100
