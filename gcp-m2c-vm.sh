@@ -447,10 +447,15 @@ if [ $MODE -eq 1 ]; then
     echo "$ curl -O https://storage.googleapis.com/modernize-plugins-prod/\$(curl -s https://storage.googleapis.com/modernize-plugins-prod/latest)/m2c-offline-bundle-linux.tar # to download the offline Migrate to Containers CLI plugins bundle" | pv -qL 100
     echo
     echo "$ \$PROJDIR/m2c plugins unpack -i \$PROJDIR/m2c-offline-bundle-linux.tar && rm \$PROJDIR/m2c-offline-bundle-linux.tar # to Unpack the offline Migrate to Containers CLI plugins bundle" | pv -qL 100
+    # echo
+    # echo "$ \$PROJDIR/m2c copy default-filters > \$PROJDIR/filters.txt # to export directory filters" | pv -qL 100
+    # echo
+    # echo "$ mkdir \$PROJDIR/filesystem && \$PROJDIR/m2c copy gcloud -p \$GCP_PROJECT -z \$VM_ZONE -n \$VM_NAME -o \$PROJDIR/filesystem --filters \$PROJDIR/filters.txt # to create local copy of source machine file system" | pv -qL 100
     echo
-    echo "$ \$PROJDIR/m2c copy default-filters > \$PROJDIR/filters.txt # to export directory filters" | pv -qL 100
+    echo "$ sudo apt-get update -qq && sudo apt-get install -y rsync # Install rsync" | pv -qL 100
+    sudo apt-get update -qq && sudo apt-get install -y rsync
     echo
-    echo "$ mkdir \$PROJDIR/filesystem && \$PROJDIR/m2c copy gcloud -p \$GCP_PROJECT -z \$VM_ZONE -n \$VM_NAME -o \$PROJDIR/filesystem --filters \$PROJDIR/filters.txt # to create local copy of source machine file system" | pv -qL 100
+    echo "$ rsync -avzh --progress --stats --exclude-from=\$PROJDIR/filters.txt --rsync-path="sudo rsync"  -e "gcloud compute ssh apache2-vm --zone=\$VM_ZONE --" :/ \$PROJDIR/filesystem/ # to syncronise file system" | pv -qL 100
     echo
     echo "$ mkdir \$PROJDIR/migrationplan && \$PROJDIR/m2c analyze -s \$PROJDIR/filesystem  -p linux-vm-container -o \$PROJDIR/migrationplan  # to get and update migration plan" | pv -qL 100
     echo
@@ -487,8 +492,14 @@ if [ $MODE -eq 1 ]; then
     read -n 1 -s -r -p "*** Review and update $PROJDIR/filters.txt to reduce the size of copied file system ***" | pv -qL 100
     echo && echo
     sudo rm -rf $PROJDIR/filesystem
-    echo "$ mkdir $PROJDIR/filesystem && $PROJDIR/m2c copy gcloud -p $GCP_PROJECT -z $VM_ZONE -n $VM_NAME -o $PROJDIR/filesystem --filters $PROJDIR/filters.txt # to create local copy of source machine file system" | pv -qL 100
-    mkdir $PROJDIR/filesystem && $PROJDIR/m2c copy gcloud -p $GCP_PROJECT -z $VM_ZONE -n $VM_NAME -o $PROJDIR/filesystem --filters $PROJDIR/filters.txt
+    # echo "$ mkdir $PROJDIR/filesystem && $PROJDIR/m2c copy gcloud -p $GCP_PROJECT -z $VM_ZONE -n $VM_NAME -o $PROJDIR/filesystem --filters $PROJDIR/filters.txt # to create local copy of source machine file system" | pv -qL 100
+    # mkdir $PROJDIR/filesystem && $PROJDIR/m2c copy gcloud -p $GCP_PROJECT -z $VM_ZONE -n $VM_NAME -o $PROJDIR/filesystem --filters $PROJDIR/filters.txt
+    echo
+    echo "$ sudo apt-get update -qq && sudo apt-get install -y rsync # Install rsync" | pv -qL 100
+    sudo apt-get update -qq && sudo apt-get install -y rsync
+    echo
+    echo "$ rsync -avzh --progress --stats --exclude-from=$PROJDIR/filters.txt --rsync-path="sudo rsync"  -e "gcloud compute ssh apache2-vm --zone=$VM_ZONE --" :/ $PROJDIR/filesystem/ # to syncronise file system" | pv -qL 100
+    rsync -avzh --progress --stats --exclude-from=$PROJDIR/filters.txt --rsync-path="sudo rsync"  -e "gcloud compute ssh apache2-vm --zone=$VM_ZONE --" :/ $PROJDIR/filesystem/
     echo
     sudo rm -rf $PROJDIR/migrationplan
     echo "$ mkdir $PROJDIR/migrationplan && $PROJDIR/m2c analyze -s $PROJDIR/filesystem  -p linux-vm-container -o $PROJDIR/migrationplan  # to get and update migration plan" | pv -qL 100
